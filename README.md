@@ -1,8 +1,9 @@
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mines Game</title>
+    <title>Mines Signals</title>
     <style>
         :root {
             --neon-blue: #00f3ff;
@@ -15,6 +16,8 @@
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
+            margin: 0;
+            padding: 0;
         }
         
         body {
@@ -22,7 +25,7 @@
             background-color: var(--deep-space);
             color: white;
             margin: 0;
-            padding: 10px;
+            padding: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -34,11 +37,130 @@
                 radial-gradient(circle at 80% 70%, rgba(255, 0, 247, 0.1) 0%, transparent 20%);
         }
         
-        .container {
+        /* Главное меню */
+        .main-menu {
+            width: 100%;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .logo {
+            font-size: clamp(24px, 8vw, 36px);
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .register-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: clamp(16px, 5vw, 20px);
+            background: linear-gradient(45deg, var(--neon-blue), var(--neon-pink));
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.5);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            margin: 10px 0;
+        }
+        
+        .register-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 26, 0.3);
+            z-index: -1;
+            transition: all 0.3s;
+        }
+        
+        .register-btn:active {
+            transform: scale(0.95);
+        }
+        
+        .register-btn:hover::after {
+            background: rgba(10, 10, 26, 0.1);
+        }
+        
+        /* Модальное окно регистрации */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        .modal-content {
+            background: rgba(20, 20, 40, 0.95);
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.5);
+            text-align: center;
+        }
+        
+        .modal-text {
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-size: clamp(14px, 4vw, 16px);
+        }
+        
+        .promo-code {
+            font-weight: bold;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px var(--neon-green);
+            font-size: clamp(16px, 5vw, 20px);
+            margin: 15px 0;
+            animation: glow 2s infinite alternate;
+            word-break: break-all;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 5px var(--neon-green); }
+            to { text-shadow: 0 0 15px var(--neon-green); }
+        }
+        
+        /* Игровой интерфейс */
+        .game-interface {
+            display: none;
             width: 100%;
             max-width: 500px;
             position: relative;
             z-index: 1;
+            padding: 15px;
         }
         
         .stars-bg {
@@ -328,20 +450,33 @@
             text-shadow: 0 0 4px var(--neon-green);
             animation: glow 2s infinite alternate;
         }
-        
-        @keyframes glow {
-            from { text-shadow: 0 0 4px var(--neon-green); }
-            to { text-shadow: 0 0 10px var(--neon-green); }
-        }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <meta name="theme-color" content="#0a0a1a">
-    <link rel="manifest" href="manifest.json">
 </head>
 <body>
     <div class="stars-bg" id="stars-bg"></div>
     
-    <div class="container">
+    <!-- Главное меню -->
+    <div class="main-menu" id="main-menu">
+        <div class="logo">MINES SIGNALS</div>
+        <button class="register-btn" id="register-btn">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+    </div>
+    
+    <!-- Модальное окно регистрации -->
+    <div class="modal" id="register-modal">
+        <div class="modal-content">
+            <div class="modal-text">
+                Привет! После регистрации тебе будет открыт доступ к сигналам!<br><br>
+                Регистрация нужна для того, чтобы провайдер игры Mines мог подключиться к твоему аккаунту.
+            </div>
+            <div class="promo-code">ПРОМОКОД: WINNERS666D</div>
+            <button class="register-btn" id="modal-register-btn">ЗАРЕГИСТРИРОВАТЬСЯ</button>
+        </div>
+    </div>
+    
+    <!-- Игровой интерфейс -->
+    <div class="game-interface" id="game-interface">
         <div class="header">
             <h1>MINES</h1>
             <div class="online">ONLINE: <span id="online-counter">21</span></div>
@@ -387,28 +522,51 @@
     </div>
 
     <script>
-        // Инициализация игрового поля
-        const initGameBoard = () => {
-            const gameBoard = document.getElementById('game-board');
-            const boardSize = 5;
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            // Элементы интерфейса
+            const mainMenu = document.getElementById('main-menu');
+            const registerBtn = document.getElementById('register-btn');
+            const registerModal = document.getElementById('register-modal');
+            const modalRegisterBtn = document.getElementById('modal-register-btn');
+            const gameInterface = document.getElementById('game-interface');
             
-            gameBoard.innerHTML = '';
+            // Проверка, была ли уже регистрация
+            const isRegistered = localStorage.getItem('registered') === 'true';
             
-            for (let i = 0; i < boardSize * boardSize; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'cell star';
-                cell.innerHTML = '★';
-                cell.dataset.index = i;
-                gameBoard.appendChild(cell);
+            if (isRegistered) {
+                mainMenu.style.display = 'none';
+                gameInterface.style.display = 'block';
+                initGame();
             }
-        };
+            
+            // Показ модального окна регистрации
+            registerBtn.addEventListener('click', function() {
+                registerModal.style.display = 'flex';
+            });
+            
+            // Регистрация и переход
+            modalRegisterBtn.addEventListener('click', function() {
+                localStorage.setItem('registered', 'true');
+                window.location.href = 'https://1wilib.life/?p=qaq5';
+            });
+            
+            // Создание фоновых звезд
+            createStars();
+            
+            // Адаптация под разные устройства
+            window.addEventListener('resize', adaptLayout);
+            adaptLayout();
+        });
         
-        // Создание фоновых звёзд
-        const createStars = () => {
+        // Функция создания звезд на фоне
+        function createStars() {
             const starsBg = document.getElementById('stars-bg');
             starsBg.innerHTML = '';
             
-            for (let i = 0; i < 80; i++) {
+            const starCount = window.innerWidth < 500 ? 60 : 80;
+            
+            for (let i = 0; i < starCount; i++) {
                 const star = document.createElement('div');
                 star.className = 'star-bg';
                 star.style.width = `${Math.random() * 2 + 1}px`;
@@ -418,30 +576,37 @@
                 star.style.animationDelay = `${Math.random() * 3}s`;
                 starsBg.appendChild(star);
             }
-        };
+        }
         
-        // Адаптация размеров
-        const adaptLayout = () => {
+        // Адаптация layout
+        function adaptLayout() {
             const vh = window.innerHeight * 0.01;
             document.documentElement.style.setProperty('--vh', `${vh}px`);
             
-            if (window.innerWidth < 500) {
-                document.querySelector('.game-board').style.maxHeight = '80vw';
-                document.querySelector('.game-board').style.maxWidth = '80vw';
-            } else {
-                document.querySelector('.game-board').style.maxHeight = '400px';
-                document.querySelector('.game-board').style.maxWidth = '400px';
+            if (window.innerWidth < 400) {
+                document.querySelector('.game-board').style.gap = '6px';
+                document.querySelectorAll('.cell').forEach(cell => {
+                    cell.style.fontSize = '18px';
+                });
             }
-        };
+        }
         
-        // Основная функция
-        const initApp = () => {
-            initGameBoard();
-            createStars();
-            adaptLayout();
-            
+        // Инициализация игры
+        function initGame() {
+            const gameBoard = document.getElementById('game-board');
+            const boardSize = 5;
             let signalPositions = [];
             let currentCrossCount = 1;
+            
+            // Создание игрового поля
+            gameBoard.innerHTML = '';
+            for (let i = 0; i < boardSize * boardSize; i++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell star';
+                cell.innerHTML = '★';
+                cell.dataset.index = i;
+                gameBoard.appendChild(cell);
+            }
             
             // Выбор количества крестиков
             document.querySelectorAll('.cross-option').forEach(option => {
@@ -462,7 +627,7 @@
                 });
                 
                 signalPositions = [];
-                const totalCells = 25;
+                const totalCells = boardSize * boardSize;
                 
                 while (signalPositions.length < currentCrossCount) {
                     const pos = Math.floor(Math.random() * totalCells);
@@ -490,7 +655,7 @@
                 setTimeout(updateOnlineCounter, 15000);
             };
             
-            // Анимация звёзд
+            // Анимация звезд
             const animateStars = () => {
                 document.querySelectorAll('.star').forEach(star => {
                     const x = (Math.random() * 8) - 4;
@@ -503,13 +668,33 @@
             updateOnlineCounter();
             animateStars();
             
-            // Обработка изменения ориентации
-            window.addEventListener('resize', adaptLayout);
-            window.addEventListener('orientationchange', adaptLayout);
-        };
+            // Обновление списка победителей
+            setInterval(updateWinners, 10000);
+            updateWinners();
+        }
         
-        // Запуск приложения
-        document.addEventListener('DOMContentLoaded', initApp);
+        // Обновление списка победителей
+        function updateWinners() {
+            const winners = [
+                { id: Math.floor(1000 + Math.random() * 9000), amount: Math.floor(500 + Math.random() * 9500), currency: '₽' },
+                { id: Math.floor(1000 + Math.random() * 9000), amount: Math.floor(100 + Math.random() * 4900), currency: '₽' },
+                { id: Math.floor(1000 + Math.random() * 9000), amount: Math.floor(50 + Math.random() * 200), currency: '$' },
+                { id: Math.floor(1000 + Math.random() * 9000), amount: Math.floor(1000 + Math.random() * 4000), currency: '₽' }
+            ];
+            
+            const winnersContainer = document.getElementById('winners-container');
+            winnersContainer.innerHTML = '';
+            
+            winners.forEach(winner => {
+                const winnerItem = document.createElement('div');
+                winnerItem.className = 'winner-item';
+                winnerItem.innerHTML = `
+                    <span>**** ${winner.id}</span>
+                    <span class="winner-amount">+${winner.amount}${winner.currency}</span>
+                `;
+                winnersContainer.appendChild(winnerItem);
+            });
+        }
     </script>
 </body>
 </html>
