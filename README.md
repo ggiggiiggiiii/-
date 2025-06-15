@@ -364,7 +364,7 @@
         </div>
         
         <div class="winners-list">
-            <h3>СЕГОДНЯШНИЕ ВЫИГРЫШИ</h3>
+            <h3>ВЫИГРЫШИ НАШИХ ПОЛЬЗОВАТЕЛЕЙ</h3>
             <div id="winners-container">
                 <div class="winner-item">
                     <span>**** 3467</span>
